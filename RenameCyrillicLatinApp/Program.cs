@@ -9,7 +9,8 @@ internal class Program
 
         if (Directory.Exists(directoryPath))
         {
-            RenameFilesAndFolders(directoryPath);
+            RenameFiles(directoryPath);
+            RenameFolders(directoryPath);
 
             Console.WriteLine("Renaming completed successfully.");
         }
@@ -17,136 +18,139 @@ internal class Program
         {
             Console.WriteLine("Directory not found.");
         }
+    }
+    private static void RenameFiles(string path) 
+    {
+        var files = Directory.GetFiles(path);
 
-        static void RenameFilesAndFolders(string directoryPath)
+        foreach (var file in files)
         {
-            var files = Directory.GetFiles(directoryPath);
-            var folders = Directory.GetDirectories(directoryPath);
+            RenameFile(file);
+        }
+    }
 
-            foreach (var file in files)
-            {
-                RenameFile(file);
-            }
+    private static void RenameFolders(string path) 
+    {
+        var folders = Directory.GetDirectories(path);
 
-            foreach (var folder in folders)
-            {
-                RenameFolder(folder);
-            }
+        foreach (var folder in folders)
+        {
+            RenameFolder(folder);
+        }
+    }
+
+    private static void RenameFile(string path)
+    {
+        var directoryName = Path.GetDirectoryName(path);
+        var oldName = Path.GetFileName(path);
+        var newName = ConvertCyrillicToLatin(oldName);
+
+        if (oldName != newName)
+        {
+            var newPath = Path.Combine(directoryName, newName);
+            File.Move(path, newPath);
+        }
+    }
+
+    private static void RenameFolder(string path)
+    {
+        string oldName = Path.GetDirectoryName(path);
+        string newName = ConvertCyrillicToLatin(oldName);
+
+        Directory.CreateDirectory(newName);
+
+        if (oldName != newName)
+        {
+            var newPath = Path.Combine(oldName, newName);
+            File.Move(path, newPath);
+        }
+    }
+
+    private static string ConvertCyrillicToLatin(string input)
+    {
+        var result = new StringBuilder();
+
+        foreach (var converted in input.Select(ConvertLetter))
+        {
+            result.Append(converted);
         }
 
-        static void RenameFile(string path)
+        return result.ToString();
+    }
+
+    private static string ConvertLetter(char c)
+    {
+        return c switch
         {
-            string directoryName = Path.GetDirectoryName(path);
-            string oldName = Path.GetFileName(path);
-            string newName = ConvertCyrillicToLatin(oldName);
+            'а' => "a",
+            'б' => "b",
+            'в' => "v",
+            'г' => "g",
+            'д' => "d",
+            'е' => "e",
+            'ё' => "yo",
+            'ж' => "zh",
+            'з' => "z",
+            'и' => "i",
+            'й' => "y",
+            'к' => "k",
+            'л' => "l",
+            'м' => "m",
+            'н' => "n",
+            'о' => "o",
+            'п' => "p",
+            'р' => "r",
+            'с' => "s",
+            'т' => "t",
+            'у' => "u",
+            'ф' => "f",
+            'х' => "kh",
+            'ц' => "ts",
+            'ч' => "ch",
+            'ш' => "sh",
+            'щ' => "sch",
+            'ъ' => "",
+            'ы' => "i",
+            'ь' => "",
+            'э' => "e",
+            'ю' => "u",
+            'я' => "ya",
 
-            if (oldName != newName)
-            {
-                string newPath = Path.Combine(directoryName, newName);
-                File.Move(path, newPath);
-            }
-        }
+            'А' => "A",
+            'Б' => "B",
+            'В' => "V",
+            'Г' => "G",
+            'Д' => "D",
+            'Е' => "E",
+            'Ё' => "E",
+            'Ж' => "ZH",
+            'З' => "Z",
+            'И' => "I",
+            'Й' => "Y",
+            'К' => "K",
+            'Л' => "L",
+            'М' => "M",
+            'Н' => "N",
+            'О' => "O",
+            'П' => "P",
+            'Р' => "R",
+            'С' => "S",
+            'Т' => "T",
+            'У' => "U",
+            'Ф' => "F",
+            'Х' => "KH",
+            'Ц' => "TS",
+            'Ч' => "CH",
+            'Ш' => "SH",
+            'Щ' => "SCH",
+            'Ъ' => "",
+            'Ы' => "I",
+            'Ь' => "",
+            'Э' => "E",
+            'Ю' => "U",
+            'Я' => "YA",
 
-        static void RenameFolder(string path)
-        {
-            string oldName = Path.GetDirectoryName(path);
-            string newName = ConvertCyrillicToLatin(oldName);
-
-            Directory.CreateDirectory(newName);
-
-            if (oldName != newName)
-            {
-                var newPath = Path.Combine(oldName, newName);
-                File.Move(path, newPath);
-            }
-        }
-
-        static string ConvertCyrillicToLatin(string input)
-        {
-            var result = new StringBuilder();
-
-            foreach (var converted in input.Select(ConvertLetter))
-            {
-                result.Append(converted);
-            }
-
-            return result.ToString();
-        }
-
-        static string ConvertLetter(char c)
-        {
-            return c switch
-            {
-                'а' => "a",
-                'б' => "b",
-                'в' => "v",
-                'г' => "g",
-                'д' => "d",
-                'е' => "e",
-                'ё' => "yo",
-                'ж' => "zh",
-                'з' => "z",
-                'и' => "i",
-                'й' => "y",
-                'к' => "k",
-                'л' => "l",
-                'м' => "m",
-                'н' => "n",
-                'о' => "o",
-                'п' => "p",
-                'р' => "r",
-                'с' => "s",
-                'т' => "t",
-                'у' => "u",
-                'ф' => "f",
-                'х' => "kh",
-                'ц' => "ts",
-                'ч' => "ch",
-                'ш' => "sh",
-                'щ' => "sch",
-                'ъ' => "",
-                'ы' => "i",
-                'ь' => "",
-                'э' => "e",
-                'ю' => "u",
-                'я' => "ya",
-
-                'А' => "A",
-                'Б' => "B",
-                'В' => "V",
-                'Г' => "G",
-                'Д' => "D",
-                'Е' => "E",
-                'Ё' => "E",
-                'Ж' => "ZH",
-                'З' => "Z",
-                'И' => "I",
-                'Й' => "Y",
-                'К' => "K",
-                'Л' => "L",
-                'М' => "M",
-                'Н' => "N",
-                'О' => "O",
-                'П' => "P",
-                'Р' => "R",
-                'С' => "S",
-                'Т' => "T",
-                'У' => "U",
-                'Ф' => "F",
-                'Х' => "KH",
-                'Ц' => "TS",
-                'Ч' => "CH",
-                'Ш' => "SH",
-                'Щ' => "SCH",
-                'Ъ' => "",
-                'Ы' => "I",
-                'Ь' => "",
-                'Э' => "E",
-                'Ю' => "U",
-                'Я' => "YA",
-
-                _ => c.ToString()
-            };
-        }
+            _ => c.ToString()
+        };
     }
 }
