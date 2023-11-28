@@ -10,7 +10,7 @@ internal class Program
         if (Directory.Exists(directoryPath))
         {
             RenameFiles(directoryPath);
-            //RenameFolders(directoryPath);
+            RenameFolders(directoryPath);
 
             Console.WriteLine("Renaming completed successfully.");
         }
@@ -55,15 +55,15 @@ internal class Program
 
     private static void RenameFolder(string path)
     {
-        var oldName = Path.GetDirectoryName(path) ?? throw new NullReferenceException();
+        var oldName = new DirectoryInfo(path).Name;
         var newName = ConvertCyrillicToLatin(oldName);
-
-        Directory.CreateDirectory(newName);
 
         if (oldName != newName)
         {
-            var newPath = Path.Combine(oldName, newName);
-            File.Move(path, newPath);
+            var pathToFolder = Path.GetDirectoryName(path) ?? throw new NullReferenceException();
+            var newPath = Path.Combine(pathToFolder, newName);
+
+            Directory.Move(path, newPath);
         }
     }
 
