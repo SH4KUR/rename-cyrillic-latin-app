@@ -31,7 +31,7 @@ internal class Program
 
     private static void RenameFolders(string path) 
     {
-        var folders = Directory.GetDirectories(path);
+        var folders = Directory.GetDirectories(path, "*", SearchOption.AllDirectories);
 
         foreach (var folder in folders)
         {
