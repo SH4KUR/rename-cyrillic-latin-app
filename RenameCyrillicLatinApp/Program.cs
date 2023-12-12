@@ -19,6 +19,7 @@ internal class Program
             Console.WriteLine("Directory not found.");
         }
     }
+    
     private static void RenameFiles(string path) 
     {
         var files = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
